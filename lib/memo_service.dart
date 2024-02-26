@@ -3,21 +3,26 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'main.dart';
+import 'package:intl/intl.dart';
 
 // Memo 데이터의 형식을 정해줍니다. 추후 isPinned, updatedAt 등의 정보도 저장할 수 있습니다.
 class Memo {
   Memo({
     required this.content,
+    required this.edtdt,
   });
 
   String content;
+  String edtdt;
 
   Map toJson() {
-    return {'content': content};
+    //return {'content': content};
+    return {'content': content, ',edtdt': edtdt};
   }
 
   factory Memo.fromJson(json) {
-    return Memo(content: json['content']);
+    //return Memo(content: json['content']);
+    return Memo(content: json['content'], edtdt: json['edtdt']);
   }
 }
 
@@ -28,12 +33,21 @@ class MemoService extends ChangeNotifier {
   }
 
   List<Memo> memoList = [
-    Memo(content: '장보기 목록: 사과, 양파'), // 더미(dummy) 데이터
-    Memo(content: '새 메모'), // 더미(dummy) 데이터
+    Memo(
+      content: '장보기 목록: 사과, 양파',
+      edtdt: 'test',
+    ), // 더미(dummy) 데이터
+    Memo(
+      content: '새 메모',
+      edtdt: 'test',
+    ), // 더미(dummy) 데이터
   ];
 
   createMemo({required String content}) {
-    Memo memo = Memo(content: content);
+    Memo memo = Memo(
+      content: content,
+      edtdt: 'test',
+    );
     memoList.add(memo);
     notifyListeners(); // Consumer<MemoService>의 builder 부분을 호출해서 화면 새로고침
     saveMemoList();
@@ -42,6 +56,7 @@ class MemoService extends ChangeNotifier {
   updateMemo({required int index, required String content}) {
     Memo memo = memoList[index];
     memo.content = content;
+    //memo.edtdt = 'test';
     notifyListeners();
     saveMemoList();
   }
