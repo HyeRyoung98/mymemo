@@ -10,19 +10,24 @@ class Memo {
   Memo({
     required this.content,
     required this.edtdt,
+    required this.isCheck,
   });
 
   String content;
   String edtdt;
+  bool isCheck;
 
   Map toJson() {
     //return {'content': content};
-    return {'content': content, ',edtdt': edtdt};
+    return {'content': content, 'edtdt': edtdt, 'isCheck': isCheck};
   }
 
   factory Memo.fromJson(json) {
     //return Memo(content: json['content']);
-    return Memo(content: json['content'], edtdt: json['edtdt']);
+    return Memo(
+        content: json['content'],
+        edtdt: json['edtdt'],
+        isCheck: json['isCheck']);
   }
 }
 
@@ -35,18 +40,21 @@ class MemoService extends ChangeNotifier {
   List<Memo> memoList = [
     Memo(
       content: '장보기 목록: 사과, 양파',
-      edtdt: 'test',
+      edtdt: DateFormat('yy/MM/dd HH:mm:ss').format(DateTime.now()),
+      isCheck: false,
     ), // 더미(dummy) 데이터
     Memo(
       content: '새 메모',
-      edtdt: 'test',
+      edtdt: DateFormat('yy/MM/dd HH:mm:ss').format(DateTime.now()),
+      isCheck: false,
     ), // 더미(dummy) 데이터
   ];
 
   createMemo({required String content}) {
     Memo memo = Memo(
       content: content,
-      edtdt: 'test',
+      edtdt: DateFormat('yy/MM/dd HH:mm:ss').format(DateTime.now()),
+      isCheck: false,
     );
     memoList.add(memo);
     notifyListeners(); // Consumer<MemoService>의 builder 부분을 호출해서 화면 새로고침
@@ -56,13 +64,37 @@ class MemoService extends ChangeNotifier {
   updateMemo({required int index, required String content}) {
     Memo memo = memoList[index];
     memo.content = content;
-    //memo.edtdt = 'test';
+    memo.edtdt = DateFormat('yy/MM/dd - HH:mm:ss').format(DateTime.now());
     notifyListeners();
     saveMemoList();
   }
 
   deleteMemo({required int index}) {
     memoList.removeAt(index);
+    notifyListeners();
+    saveMemoList();
+  }
+
+  checkMemo({required int index, required bool isCheck}) {
+    Memo memo = memoList[index];
+    memo.isCheck = isCheck;
+
+    memoList.sort(
+      (a, b) {
+        if (a.isCheck) {
+          if (b.isCheck)
+            return 0;
+          else
+            return -1;
+        } else {
+          if (b.isCheck)
+            return 1;
+          else
+            return 0;
+        }
+      },
+    );
+
     notifyListeners();
     saveMemoList();
   }

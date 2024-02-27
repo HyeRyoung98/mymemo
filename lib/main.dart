@@ -58,12 +58,21 @@ class _HomePageState extends State<HomePage> {
                   itemCount: memoList.length, // memoList 개수 만큼 보여주기
                   itemBuilder: (context, index) {
                     Memo memo = memoList[index]; // index에 해당하는 memo 가져오기
+                    bool test = memo.isCheck;
                     return ListTile(
                       // 메모 고정 아이콘
                       leading: IconButton(
-                        icon: Icon(CupertinoIcons.pin),
+                        icon: Icon(
+                          memo.isCheck
+                              ? CupertinoIcons.pin_fill   //hw1 : 핀 체크
+                              : CupertinoIcons.pin,
+                        ),
                         onPressed: () {
-                          print('$memo : pin 클릭 됨');
+                          setState(() {
+                            memoService.checkMemo(
+                                index: index,
+                                isCheck: !memo.isCheck); //hw1 : 핀 체크
+                          });
                         },
                       ),
                       // 메모 내용 (최대 3줄까지만 보여주도록)
@@ -72,7 +81,12 @@ class _HomePageState extends State<HomePage> {
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      //subtitle: Text("data"),
+                      subtitle: Row(  //hw2 : 날짜 추가
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(memo.edtdt),
+                        ],
+                      ),
                       onTap: () {
                         // 아이템 클릭시
                         Navigator.push(
@@ -125,6 +139,15 @@ class DetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        //hw3 : 빈 메모 삭제 시작
+        leading: GestureDetector(
+          child: Icon(Icons.arrow_back),
+          onTap: () {
+            String contentString = contentController.text.trim();
+            Navigator.pop(context);
+            if (contentString.isEmpty) memoService.deleteMemo(index: index);
+          },
+        ), //hw3 : 빈 메모 삭제 끝
         actions: [
           IconButton(
             onPressed: () {
